@@ -1,4 +1,4 @@
-FROM php:7.0
+FROM php:7.1
 
 LABEL maintainer="Daniel Llewellyn <daniel@bowlhat.net>"
 
