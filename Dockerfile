@@ -1,4 +1,4 @@
-FROM php:5.6
+FROM diddledockunit/php:5.3
 
 LABEL maintainer="Daniel Llewellyn <daniel@bowlhat.net>"
 
