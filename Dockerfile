@@ -17,8 +17,8 @@ ENV peclDeps=" \
         autoconf \
         default-libmysqlclient-dev \
         gcc \
+        libmcrypt-dev \
         libpng-dev \
-        libsodium-dev \
         libssl-dev \
         libxml2-dev \
         make \
@@ -26,9 +26,9 @@ ENV peclDeps=" \
     " extensions=" \
         gd \
         mbstring \
+        mcrypt \
         mysqli \
         soap \
-        sodium \
         zip \
     "
 
@@ -56,8 +56,8 @@ RUN apt-get update \
         libmemcached11 \
         libmemcachedutil2 \
         libpng16-16 \
-        libsodium18 \
         libxml2 \
+        mcrypt \
         mysql-server \
         ssh \
         subversion \
