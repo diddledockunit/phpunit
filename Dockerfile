@@ -1,4 +1,4 @@
-FROM php:5.6
+FROM php:7.0
 
 LABEL maintainer="Daniel Llewellyn <daniel@bowlhat.net>"
 
@@ -17,8 +17,8 @@ ENV peclDeps=" \
         autoconf \
         default-libmysqlclient-dev \
         gcc \
-        libmcrypt-dev \
         libpng-dev \
+        libsodium-dev \
         libssl-dev \
         libxml2-dev \
         make \
@@ -26,9 +26,9 @@ ENV peclDeps=" \
     " extensions=" \
         gd \
         mbstring \
-        mcrypt \
         mysqli \
         soap \
+        sodium \
         zip \
     "
 
@@ -41,7 +41,7 @@ RUN apt-get update \
 
 RUN apt-get update \
     && apt-get install -yqq --no-install-recommends $peclDeps \
-    && pecl install memcached-2.2.0 && echo extension=memcached.so > $PHP_INI_DIR/conf.d/ext-memcached.ini \
+    && pecl install memcached && echo extension=memcached > $PHP_INI_DIR/conf.d/ext-memcached.ini \
     && apt-get purge -yqq --auto-remove -o APT::AutoRemove::RecommendsImportant=false -o APT::AutoRemove::SuggestsImportant=false $peclDeps \
     && apt-get autoremove \
     && rm -rf /var/lib/apt/lists/*
@@ -56,8 +56,8 @@ RUN apt-get update \
         libmemcached11 \
         libmemcachedutil2 \
         libpng16-16 \
+        libsodium18 \
         libxml2 \
-        mcrypt \
         mysql-server \
         ssh \
         subversion \
@@ -69,7 +69,7 @@ RUN ln -s /var/run/mysqld/mysqld.sock /tmp/mysql.sock \
     && service mysql start \
     && mysql --user="root" --execute="CREATE DATABASE test;"
 
-RUN curl -SL "https://phar.phpunit.de/phpunit-5.phar" -o phpunit.phar \
+RUN curl -SL "https://phar.phpunit.de/phpunit-6.phar" -o phpunit.phar \
     && chmod +x phpunit.phar \
     && mv phpunit.phar /usr/bin/phpunit \
     && curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
