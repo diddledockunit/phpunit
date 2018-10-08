@@ -41,7 +41,7 @@ RUN apt-get update \
 
 RUN apt-get update \
     && apt-get install -yqq --no-install-recommends $peclDeps \
-    && pecl install memcached && echo extension=memcached > $PHP_INI_DIR/conf.d/ext-memcached.ini \
+    && pecl install memcached && echo extension=memcached.so > $PHP_INI_DIR/conf.d/ext-memcached.ini \
     && apt-get purge -yqq --auto-remove -o APT::AutoRemove::RecommendsImportant=false -o APT::AutoRemove::SuggestsImportant=false $peclDeps \
     && apt-get autoremove \
     && rm -rf /var/lib/apt/lists/*
