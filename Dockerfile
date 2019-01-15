@@ -1,75 +1,77 @@
-FROM php:5.6
+FROM php:5.6-alpine
 
 LABEL maintainer="Daniel Llewellyn <daniel@bowlhat.net>"
 
 WORKDIR /var/www/html
 
-ENV peclDeps=" \
+ENV peclBuildDeps=" \
         autoconf \
+        file \
+        g++ \
         gcc \
-        libmemcached-dev \
-        libssl-dev \
+        libressl-dev \
         libxml2-dev \
         make \
-        zlib1g-dev \
     " \
-    extensionDeps=" \
+    peclRunDeps=" \
+        libressl \
+    " \
+    extensionBuildDeps=" \
         autoconf \
-        default-libmysqlclient-dev \
         gcc \
-        libmcrypt-dev \
+        mariadb-dev \
         libpng-dev \
-        libssl-dev \
+        libressl-dev \
         libxml2-dev \
+        libzip-dev \
         make \
         rsync \
-    " extensions=" \
+    " \
+    extensionRunDeps=" \
+        libpng \
+        libressl \
+        libzip \
+        mariadb-client \
+    " \
+    extensions=" \
         gd \
-        mbstring \
-        mcrypt \
         mysqli \
         soap \
         zip \
     "
 
-RUN apt-get update \
-    && apt-get install -yqq --no-install-recommends $extensionDeps \
+RUN set -xe \
+    && apk add --no-cache --virtual .build-deps \
+        $extensionBuildDeps \
     && docker-php-ext-install $extensions \
-    && apt-get purge -yqq --auto-remove -o APT::AutoRemove::RecommendsImportant=false -o APT::AutoRemove::SuggestsImportant=false $extensionDeps \
-    && apt-get autoremove \
-    && rm -rf /var/lib/apt/lists/*
+    && apk add --no-cache --virtual .extension-rundeps $extensionRunDeps \
+    && apk del .build-deps
 
-RUN apt-get update \
-    && apt-get install -yqq --no-install-recommends $peclDeps \
-    && pecl install memcached-2.2.0 && echo extension=memcached.so > $PHP_INI_DIR/conf.d/ext-memcached.ini \
-    && apt-get purge -yqq --auto-remove -o APT::AutoRemove::RecommendsImportant=false -o APT::AutoRemove::SuggestsImportant=false $peclDeps \
-    && apt-get autoremove \
-    && rm -rf /var/lib/apt/lists/*
+RUN set -xe \
+    && apk add --no-cache --virtual .build-deps $peclBuildDeps \
+    # pecl install memcached && echo extension=memcached > $PHP_INI_DIR/conf.d/ext-memcached.ini \ # disabled due to old incompatible PHP release
+    && apk add --no-cache --virtual .rundeps $peclRunDeps \
+    && apk del .build-deps
 
-RUN apt-get update \
-    && apt-get install -yqq --no-install-recommends \
+RUN set -xe \
+    && apk add --no-cache --virtual .rundeps \
         ca-certificates \
         curl \
         git \
         less \
-        libmcrypt4 \
-        libmemcached11 \
-        libmemcachedutil2 \
-        libpng16-16 \
+        libmcrypt \
+        libpng \
+        libsodium \
         libxml2 \
-        mcrypt \
-        mysql-server \
-        ssh \
+        mariadb \
+        openssh \
         subversion \
-        wget \
-        zlib1g \
-    && rm -rf /var/lib/apt/lists/*
+        wget
 
-RUN ln -s /var/run/mysqld/mysqld.sock /tmp/mysql.sock \
-    && service mysql start \
-    && mysql --user="root" --execute="CREATE DATABASE test;"
+RUN set -xe \
+    && mysql_install_db --user=mysql --datadir=/var/lib/mysql
 
-RUN curl -SL "https://phar.phpunit.de/phpunit-5.phar" -o phpunit.phar \
+RUN curl -SL "https://phar.phpunit.de/phpunit-6.phar" -o phpunit.phar \
     && chmod +x phpunit.phar \
     && mv phpunit.phar /usr/bin/phpunit \
     && curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
