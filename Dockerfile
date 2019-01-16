@@ -55,6 +55,7 @@ RUN set -xe \
 
 RUN set -xe \
     && apk add --no-cache --virtual .rundeps \
+        bash \
         ca-certificates \
         curl \
         git \
