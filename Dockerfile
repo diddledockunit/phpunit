@@ -72,7 +72,7 @@ RUN set -xe \
 RUN set -xe \
     && mysql_install_db --user=mysql --datadir=/var/lib/mysql
 
-RUN curl -SL "https://phar.phpunit.de/phpunit-6.phar" -o phpunit.phar \
+RUN curl -SL "https://phar.phpunit.de/phpunit-5.phar" -o phpunit.phar \
     && chmod +x phpunit.phar \
     && mv phpunit.phar /usr/bin/phpunit \
     && curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar \
